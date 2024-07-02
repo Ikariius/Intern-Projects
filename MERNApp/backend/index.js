@@ -10,9 +10,11 @@ const Book = require('./model/bookModel');
 const express = require ("express");
 const cors = require ("cors");
 const app = express();
-
+const checkAdminRole = require("./middleware/checkRole");
+const validateNotBlankQuery = require("./middleware/blankCheckerQuery");
+const validateNotBlankQueryBody = require("./middleware/blankCheckerBody");
 const jwt = require("jsonwebtoken");
-const {authenticateToken} = require("./utilities");
+const {authenticateToken} = require("./middleware/authenticateToken");
 
 app.use(express.json());
 
@@ -145,7 +147,7 @@ app.get("/get-user", authenticateToken, async (req,res)=>{
 
 })
 //Add Book
-app.post("/add-book", authenticateToken, async (req, res) => {
+app.post("/add-book", authenticateToken, checkAdminRole, async (req, res) => {
     const { title, content, tags, author, publishedYear, imageUrl } = req.body;
     const { user } = req.user;
   
@@ -212,7 +214,7 @@ app.get("/books/:title", authenticateToken, async (req, res) => {
   }
 });
 //Edit Book
-app.put("/edit-book/:bookId", authenticateToken, async(req, res)=>{
+app.put("/edit-book/:bookId", authenticateToken, checkAdminRole, async(req, res)=>{
     const bookId=req.params.bookId;
     const {title, content, tags, author, publishedYear, imageUrl} = req.body;
     // const {user} = req.user;
@@ -252,7 +254,7 @@ app.put("/edit-book/:bookId", authenticateToken, async(req, res)=>{
     }
 });
 //Adding Comments
-app.put("/add-comment/:bookId", authenticateToken, async (req, res) => {
+app.put("/add-comment/:bookId", authenticateToken, validateNotBlankQueryBody, async (req, res) => {
   const bookId = req.params.bookId;
   const { user } = req.user;
   const { content } = req.body;
@@ -420,7 +422,7 @@ app.get("/get-all-books", authenticateToken, async (req, res) => {
   }
 });
 //Delete A Book
-app.delete("/delete-book/:bookId", authenticateToken, async(req, res)=>{
+app.delete("/delete-book/:bookId", authenticateToken, checkAdminRole, async(req, res)=>{
     const bookId=req.params.bookId;
     // const {user} = req.user;
 
@@ -477,7 +479,7 @@ app.put("/update-pin/:bookId", authenticateToken, async (req, res) => {
     }
   });
 //search API
-app.get("/search-books/", authenticateToken, async(req,res)=>{
+app.get("/search-books/", authenticateToken, validateNotBlankQuery, async(req,res)=>{
     const { query, option } = req.query;
 
     if(!query){
