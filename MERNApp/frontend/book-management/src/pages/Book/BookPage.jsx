@@ -1,13 +1,15 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import imagePlaceHolder from '../../assets/No-Image-Placeholder.svg';
 import {MdDelete} from 'react-icons/md';
+import { TiArrowBack } from 'react-icons/ti';
 
 const BookPage = () => {
   const { title } = useParams();
   const [book, setBook] = useState(null);
+  const navigate = useNavigate();
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
   const [userInfo, setUserInfo] = useState(null);
@@ -82,7 +84,10 @@ const getUserInfo = async() => {
 
   return (
     <BookContainer>
-        <ProductImage src={book.imageUrl || imagePlaceHolder} alt={book.title} />
+      <BackButton onClick={() => navigate('/home')}>
+        <TiArrowBack />
+      </BackButton>
+      <ProductImage src={book.imageUrl || imagePlaceHolder} alt={book.title} />
       <BookDetails>
         <BookTitle>{book.title}</BookTitle>
         <BookAuthor>by {book.author}</BookAuthor>
@@ -221,5 +226,20 @@ const DeleteButton = styled.button`
   
   &:hover {
     color: #f56565;
+  }
+`;
+
+const BackButton = styled.button`
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #0073bb;
+
+  &:hover {
+    color: #005fa3;
   }
 `;
